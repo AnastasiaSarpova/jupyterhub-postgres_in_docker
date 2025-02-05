@@ -68,3 +68,8 @@ jupyterhub-postgres_in_docker/
 └─ README.md           # Документация проекта
 ```
 ---
+Авториация пользователей:
+![Снимок экрана от 2025-02-05 17-02-35](https://github.com/user-attachments/assets/74a043bb-b9bc-4b7f-ac35-33d2b150f5be)
+Подключение к PostgreSQL:
+![Снимок экрана от 2025-02-05 17-03-12](https://github.com/user-attachments/assets/816f465e-89a9-4e3c-b1d5-93f8cd40a105)
+
