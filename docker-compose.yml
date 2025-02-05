@@ -1,0 +1,40 @@
+version: "1.0"
+services:
+  jupyterhub:
+    build: .
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jupyterhub_data:/srv/jupyterhub/data
+      - jupyterhub_logs:/var/log/jupyterhub
+      - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py
+    ports:
+      - "17000:8000"
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - jupyterhub
+  db:
+    image: postgres:17.2-alpine3.21
+    env_file: "./.env"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - jupyterhub
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+volumes:
+  jupyterhub_data:
+    name: jupyterhub_data
+  jupyterhub_logs:
+    name: jupyterhub_logs
+  pg-data:
+    name: pg-data
+networks:
+  jupyterhub:
+    name: jupyterhub
