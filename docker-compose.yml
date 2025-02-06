@@ -7,11 +7,15 @@ services:
       - jupyterhub_data:/srv/jupyterhub/data
       - jupyterhub_logs:/var/log/jupyterhub
       - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py
+    env_file:
+      - .env
     ports:
       - "17000:8000"
     restart: unless-stopped
     depends_on:
       db:
+        condition: service_healthy
+      notebook:
         condition: service_healthy
     networks:
       - jupyterhub
@@ -28,6 +32,18 @@ services:
       interval: 5s
       timeout: 10s
       retries: 3
+  notebook:
+    build:
+      context: ./pattern_notebook
+      dockerfile: Dockerfile
+    image: pattern_notebook:v1
+    healthcheck:
+      test: ["CMD-SHELL", "jupyter-notebook --version"]
+      interval: 10s
+      timeout: 15s
+      retries: 3
+    networks:
+      - jupyterhub
 volumes:
   jupyterhub_data:
     name: jupyterhub_data

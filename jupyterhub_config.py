@@ -7,7 +7,7 @@ c.JupyterHub.hub_ip = "0.0.0.0" # слушает все порты
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner' # каждому пользователю по контейнеру
 
 c.DockerSpawner.network_name = "jupyterhub"
-c.DockerSpawner.remove = True # кsонтейнеры пользователей будут автоматически удаляться после завершения работы
+c.DockerSpawner.remove = True # контейнеры пользователей будут автоматически удаляться после завершения работы
 
 c.DockerSpawner.volumes = {"jupyterhub-user-{username}": "/home/jovyan/work"}
 
@@ -16,7 +16,7 @@ c.DockerSpawner.notebook_dir = "/home/jovyan/work"
 c.DockerSpawner.image = "pattern_notebook:v1" # образ для ноутбука
 c.DockerSpawner.http_timeout = 300 # определяет максимальное время, которое хаб будет ждать ответа от пользовательского контейнера при попытке подключиться к нему
 
-c.JupyterHub.authenticator_class = 'native' # позволяет регистриоваться пользователям
+c.JupyterHub.authenticator_class = 'native' # позволяет регистрироваться пользователям
 c.Authenticator.admin_users = {"admin"}
 c.Authenticator.allowed_users = {"admin"} # список разрешенных пользователей 
 
@@ -38,3 +38,12 @@ c.ContentsManager.autosave_interval = 30000  # 30 секунд
 
 # добавляет к админке возможность менять пароли и подтверждать регистрацию пользователей
 c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}/templates/"]
+
+c.DockerSpawner.environment = {
+    "TEST_VAR": "test_value",
+    "DB_HOST": os.environ.get("DB_HOST"),
+    "DB_PORT": os.environ.get("DB_PORT"),
+    "POSTGRES_USER": os.environ.get("POSTGRES_USER"),
+    "POSTGRES_PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+    "POSTGRES_DB": os.environ.get("POSTGRES_DB"),
+}
