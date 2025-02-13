@@ -36,6 +36,10 @@ c.Authenticator.registration_expiration_days = 7  # удалить неодоб�
 c.NotebookApp.autosave = True # включение автосохранения
 c.ContentsManager.autosave_interval = 30000  # 30 секунд
 
+# Время ожидания перед отключением сервера (в секундах)
+c.JupyterHub.shutdown_idle_servers = True
+c.JupyterHub.idle_timeout = 1800  # 30 минут
+
 # добавляет к админке возможность менять пароли и подтверждать регистрацию пользователей
 c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}/templates/"]
 

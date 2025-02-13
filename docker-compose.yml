@@ -19,6 +19,7 @@ services:
         condition: service_healthy
     networks:
       - jupyterhub
+      - monitoring
   db:
     image: postgres:17.2-alpine3.21
     env_file: "./.env"
@@ -27,6 +28,7 @@ services:
     restart: unless-stopped
     networks:
       - jupyterhub
+      - monitoring
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -54,3 +56,5 @@ volumes:
 networks:
   jupyterhub:
     name: jupyterhub
+  monitoring:
+    name: monitoring

@@ -1,0 +1,18 @@
+tables_info:
+  query: |
+    SELECT
+      tablename AS table_name,
+      tableowner AS table_owner,
+      pg_total_relation_size((schemaname || '.' || tablename)::regclass) AS size_bytes
+    FROM pg_tables
+    WHERE schemaname = 'public'
+  metrics:
+    - table_size_bytes:
+        usage: GAUGE
+        description: "Size of the table in bytes"
+    - table_name:
+        usage: LABEL
+        description: "Name of the table"
+    - table_owner:
+       usage: LABEL
+       description: "Owner of the table"
