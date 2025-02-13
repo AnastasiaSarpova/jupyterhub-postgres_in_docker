@@ -12,7 +12,7 @@ scrape_configs:
     scheme: "http"
     authorization:
       type: Bearer
-      credentials: ${JUPYTER_ADMIN_TOKEN}
+      credentials: "<your-admin-token>"
   - job_name: "node_exporter"
     static_configs:
       - targets: ['node_exporter:9100']
