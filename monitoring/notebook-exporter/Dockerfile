@@ -1,20 +1,11 @@
-# Базовый образ
-FROM alpine:latest
+# Стадия сборки
+FROM python:3.9-alpine AS builder
+RUN apk add --no-cache docker-cli
+RUN pip install --no-cache-dir prometheus_client docker
 
-# Установка необходимых пакетов
-RUN apk add --no-cache bash netcat-openbsd docker-cli python3
-
-# Копирование скрипта combined_exporter.sh в контейнер
-COPY notebook-exporter.sh /notebook-exporter.sh
-
-# Копирование Python-скрипта для HTTP-сервера
-COPY metrics_server.py /usr/local/bin/metrics_server.py
-
-# Делаем скрипт исполняемым
-RUN chmod +x /notebook-exporter.sh
-
-# Порт, на котором будет работать Exporter
+# Финальный образ
+FROM python:3.9-alpine
+COPY --from=builder /usr/local /usr/local
+COPY notebook_exporter.py /notebook_exporter.py
 EXPOSE 17666
-
-# Команда для запуска Exporter
-CMD ["/notebook-exporter.sh"]
+CMD ["python", "/notebook_exporter.py"]

@@ -1,9 +1,9 @@
-version: "1.0"
 services: 
   prometheus:
     image: quay.io/prometheus/prometheus:v3.1.0
     container_name: prometheus
     restart: unless-stopped
+    mem_limit: "450m"
     ports: 
       - 17909:9090
     volumes:
@@ -15,6 +15,7 @@ services:
     image:  gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: unless-stopped
+    mem_limit: "200m"
     ports: 
       - 17808:8080
     volumes:
@@ -28,6 +29,7 @@ services:
     image: prom/node-exporter:v1.8.2
     container_name: node_exporter
     restart: unless-stopped
+    mem_limit: "15m"
     ports:
       - "17910:9100"
     networks:
@@ -36,6 +38,7 @@ services:
     image: prometheuscommunity/postgres-exporter:v0.16.0
     container_name: postgres-exporter
     restart: unless-stopped
+    mem_limit: "15m"
     networks:
       - monitoring
     volumes:
@@ -50,6 +53,9 @@ services:
     image: grafana/grafana:11.5.1
     container_name: grafana
     restart: unless-stopped
+    mem_limit: "200m"
+    depends_on:
+      - loki
     networks:
       - monitoring
     ports:
@@ -63,12 +69,56 @@ services:
     image: notebook-exporter.v1
     container_name: notebook-exporter
     restart: unless-stopped
+    mem_limit: "15m"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 17666:17666
     networks:
       - monitoring
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alertmanager
+    restart: unless-stopped
+    mem_limit: "30m"
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    networks:
+      - monitoring
+
+  fluent-bit:
+    image: fluent/fluent-bit:3.2.6
+    container_name: fluentbit
+    restart: unless-stopped
+    mem_limit: "50m"
+    ports:
+    - "2021:2021"
+    volumes:
+    - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    - /var/log:/var/log
+    - /var/log/containers:/var/log/containers
+   # - ./parsers.conf:/fluent-bit/etc/parsers.conf 
+    networks:
+    - monitoring
+
+  loki:
+    image: grafana/loki:3.4.2
+    container_name: loki
+    restart: unless-stopped
+    mem_limit: "150m"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - ./rules:/loki/rules
+    ports:
+      - "3100:3100"
+    depends_on:
+      - fluentbit
+    networks:
+    - monitoring
 
 volumes:
   prometheus_data:

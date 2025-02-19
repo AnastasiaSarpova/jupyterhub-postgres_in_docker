@@ -1,0 +1,20 @@
+global:
+  resolve_timeout: 1m
+  smtp_smarthost: 'smtp.gmail.com:587'          # SMTP-сервер для отправки писем
+  smtp_from: EMAIL_FROM              # Отправитель
+  smtp_auth_username: EMAIL_USERNAME    # Имя пользователя для аутентификации
+  smtp_auth_password: EMAIL_PASSWORD    # Пароль
+  smtp_require_tls: true                        # Включение TLS
+
+route:
+  group_wait: 10s                               # Время ожидания перед отправкой первой группы алертов
+  group_interval: 2m                            # Интервал между отправками групп алертов
+  repeat_interval: 2m                           # Интервал повторной отправки алертов
+  receiver: 'gmail-notifications'               # Получатель по умолчанию
+
+receivers:
+  - name: 'gmail-notifications'
+    email_configs:
+      - to: EMAIL_TO               # Получатель
+        headers:
+          subject: "[Alertmanager] {{ .CommonLabels.alertname }}"
