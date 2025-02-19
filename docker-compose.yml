@@ -22,16 +22,21 @@ services:
       - monitoring
   db:
     image: postgres:17.2-alpine3.21
+    container_name: postgres
     env_file: "./.env"
     volumes:
       - pg-data:/var/lib/postgresql/data
+      - ./scripts/DDL/1_ddl.sql:/docker-entrypoint-initdb.d/1_ddl.sql
+      - ./scripts/DML/2_dml.sql:/docker-entrypoint-initdb.d/2_dml.sql
+    ports:
+      - "17543:5432"
     restart: unless-stopped
     mem_limit: "300m"
     networks:
       - jupyterhub
       - monitoring
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 5s
       timeout: 10s
       retries: 3
